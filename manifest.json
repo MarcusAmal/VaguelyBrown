@@ -1,17 +1,21 @@
 {
   "manifest_version": 2,
   "name": "Vaguely Brown",
-  "description": "Like images of outfits while browsing the
-  web and add them to your collection.",
-  "version": "1",
+  "description": "Like images of outfits while browsing the web and add them to your collection.",
+  "version": "1.01",
   "author": "Vaguely Brown Team",
 
+  "oauth2": {
+      "client_id": "500731888901-lq25dqejdqd5nt9ic15b9uiuugmnnhcv.apps.googleusercontent.com",
+      "scopes":["https://www.googleapis.com/auth/contacts.readonly"]
+    },
+
   "content_scripts": [{
-    "matches": ["http://*/*", "https://*/*"],
+    "matches": ["https://www.pinterest.com/*"],
     "js": ["content.js"]
     }],
 
-    "content_security_policy":"script-src 'self' https://www.gstatic.com/ https://*.firebaseio.com https://www.googleapis.com https://ajax.googleapis.com; object-src 'self'; connect-src 'self'",
+    "content_security_policy": "script-src 'self' 'unsafe-eval' https://www.gstatic.com/ https://*.firebaseio.com https://www.googleapis.com https://ajax.googleapis.com https://apis.google.com/; object-src 'self'",
 
   "background": {
     "page": "background.html",
@@ -23,8 +27,8 @@
   },
 
   "permissions": [
-    "activeTab"
+    "activeTab",
+    "identity",
+    "https://vageulybrown-ixukjmvrvm.now.sh/*"
   ]
-
-
 }
