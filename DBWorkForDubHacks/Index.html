@@ -7,27 +7,18 @@
 <html>
 <body>
   <nav class = "nav">
-    <div id = "name"><h2>V.B.</h2></div>
+    <div id = "name"><h2>V A G U E L Y</h2></div>
   </nav>
-
-  <section id = "Welcome">
-    <h1> V A G U E L Y  &nbsp; B R O W N </h1>
-  </section>
   <div class = "column">
     <div class = "columns">
-      <img src = "Streetwear1.png"/>
-      <img src = "Streetwear2.JPG"/>
-      <img src = "Fashion1.jpeg"/>
+      <img id="image1" src = "" align="middle"/>
+      <img id="image2" src = "" align="middle"/>
+      <img id="image3" src = "" align="middle"/>
     </div>
     <div class = "columns">
-      <img src = "Streetwear3.jpg"/>
-      <img src = "Fashion2.JPG"/>
-      <img src = "Streetwear3.JPG"/>
-    </div>
-    <div class = "columns">
-      <img src = "Streetwear5.jpg"/>
-      <img src = "WinterWeather1.jpg"/>
-      <img src = "WinterWeather2.jpg"/>
+      <img id="image4" src = "" align="middle"/>
+      <img id="image5" src = "" align="middle"/>
+      <img id="image6" src = "" align="middle"/>
     </div>
   </div>s
   <footer>
@@ -37,3 +28,111 @@
 </body>
 
 </html>
+
+<script src="https://www.gstatic.com/firebasejs/5.5.5/firebase.js"></script>
+
+<!-- Firebase App is always required and must be first -->
+<script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-app.js"></script>
+
+<!-- Add additional services that you want to use -->
+<script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-database.js"></script>
+<!-- <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-firestore.js"></script> -->
+<!-- <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-messaging.js"></script> -->
+<!-- <script src="https://www.gstatic.com/firebasejs/5.5.5/firebase-functions.js"></script> -->
+
+<script>
+// Initialize Firebase
+var config = {
+  apiKey: "AIzaSyCDPtDz7PmYmGhFPQaHjDFX1h9h5MyuzkA",
+  authDomain: "brownbase-bfbcf.firebaseapp.com",
+  databaseURL: "https://brownbase-bfbcf.firebaseio.com",
+  projectId: "brownbase-bfbcf",
+  storageBucket: "brownbase-bfbcf.appspot.com",
+  messagingSenderId: "763400833063"
+};
+firebase.initializeApp(config);
+</script>
+
+<script>
+var provider = new firebase.auth.GoogleAuthProvider();
+
+firebase.auth().signInWithPopup(provider).then(function(result) {
+  // This gives you a Google Access Token. You can use it to access the Google API.
+  var token = result.credential.accessToken;
+  console.log(token);
+  // The signed-in user info.
+  var user = result.user;
+  console.log(user);
+  // ...
+}).catch(function(error) {
+  // Handle Errors here.
+  var errorCode = error.code;
+  var errorMessage = error.message;
+  // The email of the user's account used.
+  var email = error.email;
+  // The firebase.auth.AuthCredential type that was used.
+  var credential = error.credential;
+  // ...
+});
+
+var userId = "ya29_Gls9BtwsGQdL_sofCxiGY19dvBTfbkdpwZH17aIoUla4FSNhSeFzntlJtpwLaNBxsv4PR51jyX1pSRP_hwMVIZH_q801XbOjA8IbGaPd9CmCmYGEMcz4jn2pFDVh";
+var listOfOutfits = [];
+var listOfSuggestions = [];
+
+var rootRef = firebase.database().ref();
+var userRef = rootRef.child(userId);
+userRef.once("value", function(snapshot) {
+  snapshot.forEach(function(child) {
+    listOfOutfits.push(child.val().outfit_image);
+  });
+});
+
+rootRef.once("value").then(function(snapshot) {
+  snapshot.forEach(function(child) {
+    if(child.key != userId) {
+      var urlRef = rootRef.child(child.key);
+      urlRef.once("value").then(function(snapshot) {
+        var match = false;
+        var userOutfits = [];
+
+        snapshot.forEach(function(child) {
+          for(var i = 0; i < listOfOutfits.length; i++) {
+            if(listOfOutfits[i] == child.val().outfit_image) {
+              match = true;
+            }
+          }
+          userOutfits.push(child.val());
+        });
+        if(match) {
+          Array.prototype.push.apply(listOfSuggestions, userOutfits);
+        }
+      });
+    }
+  });
+});
+
+function shuffle(a) {
+    var j, x, i;
+    for (i = a.length - 1; i > 0; i--) {
+        j = Math.floor(Math.random() * (i + 1));
+        x = a[i];
+        a[i] = a[j];
+        a[j] = x;
+    }
+    return a;
+}
+
+setTimeout(function printLists() {
+  console.log(listOfSuggestions);
+  shuffle(listOfSuggestions);
+  for(var i = 0; i < listOfSuggestions.length && i < 9; i++) {
+    document.getElementById("image"+(i+1)).src=listOfSuggestions[i].outfit_image;
+
+    for(var j = 0; j < 3 && j < listOfSuggestions[i].colorscheme.length && j < listOfSuggestions[i].clothing.length; j++) {
+      var clothing = listOfSuggestions[i].colorscheme[j].w3c.name + " " + listOfSuggestions[i].clothing[j].name;
+      console.log(clothing);
+    }
+  }
+}, 500);
+</script>
