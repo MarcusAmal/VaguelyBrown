@@ -3,30 +3,45 @@
     chrome.tabs.executeScript(null, {file: "content.js"});
   }
 )*/
-
+var config = {
+      apiKey: "AIzaSyCDPtDz7PmYmGhFPQaHjDFX1h9h5MyuzkA",
+      authDomain: "brownbase-bfbcf.firebaseapp.com",
+      databaseURL: "https://brownbase-bfbcf.firebaseio.com",
+      projectId: "brownbase-bfbcf",
+      storageBucket: "brownbase-bfbcf.appspot.com",
+      messagingSenderId: "763400833063"
+  };
+firebase.initializeApp(config);
 /* Regex-pattern to check URLs against.
    It matches URLs like: http[s]://[...]stackoverflow.com[...] */
 
 /* A function creator for callbacks */
 function updateDatabase(imgURL) {
-  $.post('localhost:3000/postLikedImage', {
+  userBaseRef = firebase.database().ref('Marcus').push();
+  $.get('localhost:3000/predict'+imgURL, function(data) {
+    alert(data);
+    userBaseRef.set({
+      outfit_image: imgURL,
+      colorscheme: data,
+      clothing: data
+    });
+  });
+}
+  /*('localhost:3000/postLikedImage', {
     userID: 'ID HERE',
     imageURL: imgURL,
     timestamp: Date.now()
-  })
-}
+  })*/
 
 /* When the browser-action button is clicked... */
 chrome.browserAction.onClicked.addListener(function(tab) {
     /*...check the URL of the active tab against our pattern and... */
         /* ...if it matches, send a message specifying a callback too */
+
         chrome.tabs.sendMessage(tab.id, { text: "report_back" },
-                                doStuffWithDOM);
+                                updateDatabase);
 
 });
-
-
-
 
 
 
